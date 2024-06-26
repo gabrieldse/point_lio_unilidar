@@ -1,0 +1,11 @@
+<launch>
+  <!-- Including a launch file from a package in workspace1 -->
+  <include file="/home/catkin_point_lio_unilidar/src/point_lio_unilidar/launch/mapping_unilidar.launch" />
+
+  <!-- Node to start rosbag recording -->
+  <node name="rosbag_record" pkg="rosbag" type="record" args="-o /home/raw_lidar_data/  -a" output="screen">
+      <!-- Ensure rosbag stops when the launch file is stopped -->
+      <param name="rosbag_stop" value="true" />
+  </node>
+
+</launch>
