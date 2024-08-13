@@ -281,50 +281,138 @@ void Preprocess::velodyne_handler(const sensor_msgs::PointCloud2::ConstPtr &msg)
 }
 
 
+// void Preprocess::unilidar_handler(const sensor_msgs::PointCloud2::ConstPtr &msg)
+// {
+//     pl_surf.clear();
+//     pl_corn.clear();
+//     pl_full.clear();
+
+//     pcl::PointCloud<unilidar_ros::Point> pl_orig;
+//     pcl::fromROSMsg(*msg, pl_orig); // the problem to simulate the unitreel1 might be here
+//     int plsize = pl_orig.points.size();
+//     if (plsize == 0) return;
+
+//     pl_surf.reserve(plsize);
+
+//     // std::cout << "plsize = " << plsize << ", given_offset_time = " << given_offset_time << std::endl;
+//     int countElimnated = 0;
+//     for (int i = 0; i < plsize; i++)
+//     {
+//       PointType added_pt;
+      
+//       added_pt.normal_x = 0;
+//       added_pt.normal_y = 0;
+//       added_pt.normal_z = 0;
+
+//       added_pt.x = pl_orig.points[i].x;
+//       added_pt.y = pl_orig.points[i].y;
+//       added_pt.z = pl_orig.points[i].z;
+      
+//       added_pt.intensity = pl_orig.points[i].intensity;
+
+//       added_pt.curvature = pl_orig.points[i].time * time_unit_scale; 
+
+//       if (added_pt.x * added_pt.x + added_pt.y * added_pt.y + added_pt.z * added_pt.z > (blind * blind))
+//       {
+//         pl_surf.points.push_back(added_pt);
+//       }
+//       else
+//       {
+//         countElimnated++;
+//       }
+//     }
+
+//     // std::cout << "pl_surf.size() = " << pl_surf.size() << ", countElimnated = " << countElimnated << std::endl;
+    
+// }
+
 void Preprocess::unilidar_handler(const sensor_msgs::PointCloud2::ConstPtr &msg)
 {
+    // Clear previous data
     pl_surf.clear();
     pl_corn.clear();
     pl_full.clear();
 
+    // Print header info of the incoming ROS message
+    std::cout << "ROS PointCloud2 Message Header:\n";
+    std::cout << "  Frame ID: " << msg->header.frame_id << "\n";
+    std::cout << "  Height: " << msg->height << "\n";
+    std::cout << "  Width: " << msg->width << "\n";
+    std::cout << "  Is Dense: " << msg->is_dense << "\n";
+
+    // Convert ROS PointCloud2 to PCL PointCloud
     pcl::PointCloud<unilidar_ros::Point> pl_orig;
     pcl::fromROSMsg(*msg, pl_orig);
+
+    // Print the first 10 non-zero x points before processing
+    std::cout << "First 10 non-zero x points before processing:\n";
+    int print_count = 0; // Counter for printed points
+    const int max_prints = 10; // Maximum number of points to print
+
+    for (const auto& point : pl_orig.points)
+    {
+        if (print_count >= max_prints) break; // Stop after printing 10 points
+
+        if (point.x != 0)
+        {
+            std::cout << "  x: " << point.x << ", y: " << point.y << ", z: " << point.z
+                      << ", intensity: " << point.intensity << ", time: " << point.time << "\n";
+            print_count++;
+        }
+    }
+
     int plsize = pl_orig.points.size();
     if (plsize == 0) return;
 
     pl_surf.reserve(plsize);
 
-    // std::cout << "plsize = " << plsize << ", given_offset_time = " << given_offset_time << std::endl;
-    int countElimnated = 0;
+    int countEliminated = 0;
     for (int i = 0; i < plsize; i++)
     {
-      PointType added_pt;
-      
-      added_pt.normal_x = 0;
-      added_pt.normal_y = 0;
-      added_pt.normal_z = 0;
+        PointType added_pt;
 
-      added_pt.x = pl_orig.points[i].x;
-      added_pt.y = pl_orig.points[i].y;
-      added_pt.z = pl_orig.points[i].z;
-      
-      added_pt.intensity = pl_orig.points[i].intensity;
+        added_pt.normal_x = 0;
+        added_pt.normal_y = 0;
+        added_pt.normal_z = 0;
 
-      added_pt.curvature = pl_orig.points[i].time * time_unit_scale; 
+        added_pt.x = pl_orig.points[i].x;
+        added_pt.y = pl_orig.points[i].y;
+        added_pt.z = pl_orig.points[i].z;
 
-      if (added_pt.x * added_pt.x + added_pt.y * added_pt.y + added_pt.z * added_pt.z > (blind * blind))
-      {
-        pl_surf.points.push_back(added_pt);
-      }
-      else
-      {
-        countElimnated++;
-      }
+        added_pt.intensity = pl_orig.points[i].intensity;
+
+        added_pt.curvature = pl_orig.points[i].time * time_unit_scale;
+
+        if (added_pt.x * added_pt.x + added_pt.y * added_pt.y + added_pt.z * added_pt.z > (blind * blind))
+        {
+            pl_surf.points.push_back(added_pt);
+        }
+        else
+        {
+            countEliminated++;
+        }
     }
 
-    // std::cout << "pl_surf.size() = " << pl_surf.size() << ", countElimnated = " << countElimnated << std::endl;
-    
+    // Print the first 10 non-zero x points after processing
+    std::cout << "First 10 non-zero x points after processing:\n";
+    print_count = 0; // Reset counter for printed points
+
+    for (const auto& point : pl_surf.points)
+    {
+        if (print_count >= max_prints) break; // Stop after printing 10 points
+
+        if (point.x != 0)
+        {
+            std::cout << "  x: " << point.x << ", y: " << point.y << ", z: " << point.z
+                      << ", intensity: " << point.intensity << ", curvature: " << point.curvature << "\n";
+            print_count++;
+        }
+    }
+
+    // Print results after processing
+    std::cout << "pl_surf.size() = " << pl_surf.size() << ", countEliminated = " << countEliminated << "\n";
 }
+
 
 
 void Preprocess::hesai_handler(const sensor_msgs::PointCloud2::ConstPtr &msg)
