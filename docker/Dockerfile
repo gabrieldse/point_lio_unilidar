@@ -18,8 +18,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
-# RUN echo "source /home/unilidar_sdk/unitree_lidar_ros/devel/setup.bash" >> ~/.bashrc
-# RUN echo "source /home/catkin_point_lio_unilidar/devel/setup.bash" >> ~/.bashrc
 
 # setup entrypoint
 COPY ./ros_entrypoint.sh /
