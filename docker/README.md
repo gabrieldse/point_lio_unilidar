@@ -24,10 +24,7 @@ rostopic echo /unilidar/cloud
 ```
 to see the point cloud array on the terminal.
 
-
-### Commands:
-
-docker start <image_name> & docker exec -it <image_name> /bin/bash
+# Transfer the Point Clouds:
 
 Script to run the data recording (ROSBAG Recordings) and transfer them via ssh:
 
@@ -40,3 +37,8 @@ You should change the following parameters at the begging of the file in order f
 - LOCAL_HOST="192.168.43.158"  # main pc's ip
 - LOCAL_PATH="/home/sqdr/Desktop" # path to save the bagfiles
 - PI_PATH="/home/pi_lio/data/" # pi's path
+
+### Commands:
+
+docker start <image_name> & docker exec -it <image_name> /bin/bash
+
