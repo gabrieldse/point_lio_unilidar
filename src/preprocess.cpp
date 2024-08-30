@@ -333,33 +333,11 @@ void Preprocess::unilidar_handler(const sensor_msgs::PointCloud2::ConstPtr &msg)
     pl_corn.clear();
     pl_full.clear();
 
-    // Print header info of the incoming ROS message
-    std::cout << "ROS PointCloud2 Message Header:\n";
-    std::cout << "  Frame ID: " << msg->header.frame_id << "\n";
-    std::cout << "  Height: " << msg->height << "\n";
-    std::cout << "  Width: " << msg->width << "\n";
-    std::cout << "  Is Dense: " << msg->is_dense << "\n";
 
     // Convert ROS PointCloud2 to PCL PointCloud
     pcl::PointCloud<unilidar_ros::Point> pl_orig;
     pcl::fromROSMsg(*msg, pl_orig);
 
-    // Print the first 10 non-zero x points before processing
-    std::cout << "First 10 non-zero x points before processing:\n";
-    int print_count = 0; // Counter for printed points
-    const int max_prints = 10; // Maximum number of points to print
-
-    for (const auto& point : pl_orig.points)
-    {
-        if (print_count >= max_prints) break; // Stop after printing 10 points
-
-        if (point.x != 0)
-        {
-            std::cout << "  x: " << point.x << ", y: " << point.y << ", z: " << point.z
-                      << ", intensity: " << point.intensity << ", time: " << point.time << "\n";
-            print_count++;
-        }
-    }
 
     int plsize = pl_orig.points.size();
     if (plsize == 0) return;
@@ -393,24 +371,6 @@ void Preprocess::unilidar_handler(const sensor_msgs::PointCloud2::ConstPtr &msg)
         }
     }
 
-    // Print the first 10 non-zero x points after processing
-    std::cout << "First 10 non-zero x points after processing:\n";
-    print_count = 0; // Reset counter for printed points
-
-    for (const auto& point : pl_surf.points)
-    {
-        if (print_count >= max_prints) break; // Stop after printing 10 points
-
-        if (point.x != 0)
-        {
-            std::cout << "  x: " << point.x << ", y: " << point.y << ", z: " << point.z
-                      << ", intensity: " << point.intensity << ", curvature: " << point.curvature << "\n";
-            print_count++;
-        }
-    }
-
-    // Print results after processing
-    std::cout << "pl_surf.size() = " << pl_surf.size() << ", countEliminated = " << countEliminated << "\n";
 }
 
 

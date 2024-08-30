@@ -447,7 +447,6 @@ void imu_cbk(const sensor_msgs::Imu::ConstPtr &msg_in)
 {
 
     publish_count++;
-    ROS_INFO("IMU message received");
 
     sensor_msgs::Imu::Ptr msg(new sensor_msgs::Imu(*msg_in));
 
@@ -551,9 +550,6 @@ bool sync_packages(MeasureGroup &meas)
         return false;
     }
 
-    /*** push imu data, and pop from imu buffer ***/
-    // Debug: Start IMU processing
-    std::cout << "[Debug] Starting IMU processing" << std::endl;
 
     if (p_imu->imu_need_init_)
     {
@@ -978,8 +974,6 @@ int main(int argc, char **argv)
         {
             if (!p_imu->gravity_align_)
             {
-                // Debug: IMU gravity alignment not yet done
-            std::cout << "[Debug] IMU gravity alignment not yet done" << std::endl;
                 while (Measures.lidar_beg_time > imu_next.header.stamp.toSec())
                 {
                     imu_last = imu_next;
@@ -1019,7 +1013,7 @@ int main(int argc, char **argv)
             if (!p_imu->gravity_align_)
             {
                 // Debug: IMU gravity alignment completed
-std::cout << "[Debug] IMU gravity alignment completed" << std::endl;
+                std::cout << "[Debug] IMU gravity alignment completed" << std::endl;
 
                 state_in.gravity << VEC_FROM_ARRAY(gravity_init);
                 state_out.gravity << VEC_FROM_ARRAY(gravity_init);
@@ -1164,8 +1158,6 @@ std::cout << "[Debug] IMU gravity alignment completed" << std::endl;
                     bool imu_comes = time_current > imu_next.header.stamp.toSec();
                     while (imu_comes)
                     {
-                        // Debug: IMU covariance update in progress
-    std::cout << "[Debug] IMU covariance update in progress" << std::endl;
                         imu_upda_cov = true;
                         angvel_avr << imu_next.angular_velocity.x, imu_next.angular_velocity.y, imu_next.angular_velocity.z;
                         acc_avr << imu_next.linear_acceleration.x, imu_next.linear_acceleration.y, imu_next.linear_acceleration.z;
